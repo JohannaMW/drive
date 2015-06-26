@@ -14,6 +14,5 @@ def get_scooter(request):
     current_date_time = now.isoformat()
     #scooter = Scooter.objects.get(time=current_date_time)
     scooter = Scooter.objects.all()
-    #data = json.dumps(scooter)
     data = serializers.serialize('json', scooter)
     return HttpResponse(data, content_type='application/json')
