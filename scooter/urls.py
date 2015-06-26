@@ -1,21 +1,28 @@
-"""scooter URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.8/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
-Including another URLconf
-    1. Add an import:  from blog import urls as blog_urls
-    2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
-"""
-from django.conf.urls import include, url
+from django.conf.urls import patterns, include, url
 from django.contrib import admin
+from rest_framework import routers
+from django.conf import settings
+from django.conf.urls.static import static
 
-urlpatterns = [
-    url(r'^', include('api.urls')),
-]
+from app.api.views import *
+
+router = routers.DefaultRouter()
+router.register(r'driver', DriverViewSet, base_name='drivers')
+router.register(r'scooter', ScooterViewSet, base_name='scooters')
+router.register(r'trips', TripViewSet, base_name='trips')
+
+urlpatterns = patterns('',
+
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^$', 'app.views.home', name="home"),#
+
+    #AJAX_calls
+    url(r'^get_scooter/$', 'app.views.get_scooter', name='get_scooter'),
+
+    #REST
+    url(r'^', include(router.urls)), # Include router urls into our urlpatterns
+    url(r'^app-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    )
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
